@@ -142,6 +142,33 @@ untitled10/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\untitled10.dir\build.make CMakeFiles/untitled10.dir/build
 .PHONY : untitled10/fast
 
+libs/algorithms/algorithms.obj: libs/algorithms/algorithms.c.obj
+
+.PHONY : libs/algorithms/algorithms.obj
+
+# target to build an object file
+libs/algorithms/algorithms.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\untitled10.dir\build.make CMakeFiles/untitled10.dir/libs/algorithms/algorithms.c.obj
+.PHONY : libs/algorithms/algorithms.c.obj
+
+libs/algorithms/algorithms.i: libs/algorithms/algorithms.c.i
+
+.PHONY : libs/algorithms/algorithms.i
+
+# target to preprocess a source file
+libs/algorithms/algorithms.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\untitled10.dir\build.make CMakeFiles/untitled10.dir/libs/algorithms/algorithms.c.i
+.PHONY : libs/algorithms/algorithms.c.i
+
+libs/algorithms/algorithms.s: libs/algorithms/algorithms.c.s
+
+.PHONY : libs/algorithms/algorithms.s
+
+# target to generate assembly for a file
+libs/algorithms/algorithms.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\untitled10.dir\build.make CMakeFiles/untitled10.dir/libs/algorithms/algorithms.c.s
+.PHONY : libs/algorithms/algorithms.c.s
+
 main.obj: main.c.obj
 
 .PHONY : main.obj
@@ -178,6 +205,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... untitled10
+	@echo ... libs/algorithms/algorithms.obj
+	@echo ... libs/algorithms/algorithms.i
+	@echo ... libs/algorithms/algorithms.s
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s

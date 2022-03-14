@@ -6,5 +6,23 @@
 
 #IncludeRegexTransform: 
 
+C:/Users/DeriliyDarkNight/CLionProjects/untitled10/libs/algorithms/algorithms.h
+stdio.h
+-
+stdbool.h
+-
+
 C:/Users/DeriliyDarkNight/CLionProjects/untitled10/main.c
+stdio.h
+-
+stdlib.h
+-
+stdbool.h
+-
+time.h
+-
+memory.h
+-
+libs/algorithms/algorithms.h
+C:/Users/DeriliyDarkNight/CLionProjects/untitled10/libs/algorithms/algorithms.h
 
