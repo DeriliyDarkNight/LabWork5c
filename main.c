@@ -21,6 +21,14 @@ typedef struct GeneratingFunc {
     // используемое при выводе
 } GeneratingFunc;
 
+// функция сортировки
+typedef struct nCompSort {
+    long long (*nComp )(int *a, size_t n); // указатель на функцию
+    // сортировки
+    char name[64];                   // имя сортировки,
+    // используемое при выводе
+} nCompSort;
+
 #define TIME_TEST(testCode, time){ \
     clock_t start_time = clock() ; \
     testCode \
@@ -51,7 +59,7 @@ void checkTime(void (*sortFunc )(int *, size_t),
 
         // запись в файл
         char filename[256];
-        sprintf(filename, "./data/%s.csv", experimentName);
+        sprintf(filename, "./data/SortTime/%s.csv", experimentName);
         FILE *f = fopen(filename, "a");
         if (f == NULL) {
             printf(" FileOpenError %s", filename);
@@ -98,7 +106,7 @@ void bubbleSort(int *a, size_t size) {
                 swap(&a[j - 1], &a[j]);
 }
 
-void combsort(int *a, const size_t size) {
+void combSort(int *a, const size_t size) {
     size_t step = size;
     int swapped = 1;
     while (step > 1 || swapped) {
@@ -133,7 +141,6 @@ int digit(int n, int k, int N, int M) {
     return (n >> (N * k) & (M - 1));
 }
 
-
 void radixSort_(int *l, int *r, int N) {
     int k = (32 + N - 1) / N;
     int M = 1 << N;
@@ -163,6 +170,76 @@ void radixSort_(int *l, int *r, int N) {
 
 void radixSort(int *a, size_t n) {
     radixSort_(a, a + n, 8);
+}
+
+long long selectionSortNComp(int *a, size_t size) {
+    long long countComp = 0;
+    for (int i = 0; i < size - 1 && ++countComp; i++) {
+        int minPos = i;
+        for (int j = i + 1; j < size && ++countComp; j++)
+            if (a[j] < a[minPos] && ++countComp)
+                minPos = j;
+        swap(&a[i], &a[minPos]);
+    }
+    return countComp;
+}
+
+long long insertionSortNComp(int *a, size_t size) {
+    long long countComp = 0;
+    for (size_t i = 1; i < size && ++countComp; i++) {
+        int t = a[i];
+        size_t j = i;
+        while (j > 0 && ++countComp && a[j - 1] > t && ++countComp) {
+            a[j] = a[j - 1];
+            j--;
+        }
+        a[j] = t;
+    }
+    return countComp;
+}
+
+long long bubbleSortNComp(int *a, size_t size) {
+    long long countComp = 0;
+    for (size_t i = 0; i < size - 1 && ++countComp; i++)
+        for (size_t j = size - 1; j > i && ++countComp; j--)
+            if (a[j - 1] > a[j] && ++countComp)
+                swap(&a[j - 1], &a[j]);
+
+    return countComp;
+}
+
+long long combSortNComp(int *a, const size_t size) {
+    size_t step = size;
+    int swapped = 1;
+    long long countComp = 0;
+    while (step > 1 && ++countComp || swapped && ++countComp) {
+        if (step > 1 && ++countComp)
+            step /= 1.24733;
+        swapped = 0;
+        for (size_t i = 0, j = i + step; j < size && ++countComp; ++i, ++j)
+            if (a[i] > a[j] && ++countComp) {
+                swap(&a[i], &a[j]);
+                swapped = 1;
+            }
+    }
+    return countComp;
+}
+
+long long shellSortNComp(int *a, size_t size) {
+    long long countComp = 0;
+    for (size_t step = size / 2; step > 0 && ++countComp; step /= 2)
+        for (size_t i = step; i < size && ++countComp; i++) {
+            int tmp = a[i];
+            size_t j;
+            for (j = i; j >= step && ++countComp; j -= step) {
+                if (tmp < a[j - step] && ++countComp)
+                    a[j] = a[j - step];
+                else
+                    break;
+            }
+            a[j] = tmp;
+        }
+    return countComp;
 }
 
 void generateRandomArray(int *a, size_t size) {
@@ -196,9 +273,9 @@ void generateOrderedBackwards(int *a, size_t size) {
     qsort(a, size, sizeof(int), cmpReverse);
 }
 
-void checkNComp(long long (*nComp )(int *a, size_t n),
+void checkNComp(long long (*nCompSort )(int *, size_t),
                 void (*generateFunc)(int *, size_t),
-                size_t size, char *experimentName, char *name) {
+                size_t size, char *experimentName) {
     static size_t runCounter = 1;
 
     // генерация последовательности
@@ -208,7 +285,7 @@ void checkNComp(long long (*nComp )(int *a, size_t n),
     printf("Name: %s\n", experimentName);
 
     // замер времени
-    long long nComps = nComp(innerBuffer, size);
+    long long nComps = nCompSort(innerBuffer, size);
 
     // результаты замера
     printf("Status: ");
@@ -241,12 +318,13 @@ void timeExperiment() {
             {selectionSort, "selectionSort"},
             {insertionSort, "insertionSort"},
             {bubbleSort,    "bubbleSort"},
-            {combsort,      "combSort"},
+            {combSort,      "combSort"},
             {ShellSort,     "shellSort"},
             {radixSort,     "radixSort"},
             // вы добавите свои сортировки
     };
     const unsigned FUNCS_N = ARRAY_SIZE (sorts);
+
     // описание функций генерации
     GeneratingFunc generatingFuncs[] = {
             // генерируется случайный массив
@@ -271,6 +349,35 @@ void timeExperiment() {
                 checkTime(sorts[i].sort,
                           generatingFuncs[j].generate,
                           size, filename);
+            }
+        }
+        printf("\n");
+    }
+
+    // описание функций сортировки
+    nCompSort nComps[] = {
+            {selectionSortNComp, "selectionSortNComp"},
+            {insertionSortNComp, "insertionSortNComp"},
+            {bubbleSortNComp,    "bubbleSortNComp"},
+            {combSortNComp,      "combSortNComp"},
+            {shellSortNComp,     "shellSortNComp"},
+            // вы добавите свои сортировки
+    };
+    const unsigned COMPS_N = ARRAY_SIZE (nComps);
+
+    // запись статистики в файл
+    for (size_t size = 10000; size <= 100000; size += 10000) {
+        printf(" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
+        printf("Size : %d\n", size);
+        for (int i = 0; i < COMPS_N; i++) {
+            for (int j = 0; j < CASES_N; j++) {
+                // генерация имени файла
+                static char filename[128];
+                sprintf(filename, "%s_%s_comps",
+                        nComps[i].name, generatingFuncs[j].name);
+                checkNComp(nComps[i].nComp,
+                           generatingFuncs[j].generate,
+                           size, filename);
             }
         }
         printf("\n");
