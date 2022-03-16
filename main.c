@@ -55,7 +55,7 @@ void checkTime(void (*sortFunc )(int *, size_t),
     // результаты замера
     printf(" Status : ");
     if (isOrdered(innerBuffer, size)) {
-        printf("OK! Time : %.3f s.\n", time);
+        printf("OK! Time : %.5f s.\n", time);
 
         // запись в файл
         char filename[256];
@@ -65,7 +65,7 @@ void checkTime(void (*sortFunc )(int *, size_t),
             printf(" FileOpenError %s", filename);
             exit(1);
         }
-        fprintf(f, "%zu; %.3f\n", size, time);
+        fprintf(f, "%zu; %.5f\n", size, time);
         fclose(f);
     } else {
         printf(" Wrong !\n");
